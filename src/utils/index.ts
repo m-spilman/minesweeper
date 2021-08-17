@@ -1,5 +1,5 @@
+
 import { MAX_COLS, MAX_ROWS, NUMBER_OF_BOMBS } from "../constants";
-// import { Cell, CellState, CellValue } from "../types";
 import { Cell, CellState} from "../types";
 
 export const generateCells = (): Cell[][] => {
@@ -9,26 +9,20 @@ export const generateCells = (): Cell[][] => {
     cells.push([]);
     for (let col = 0; col < MAX_COLS; col++) {
       cells[row].push({
-        // value: CellValue.none,
         value: 0,
-        state: CellState.visible
+        state: CellState.hidden
       });
     }
   }
   let bombsPlaced = 0;
   while (bombsPlaced < NUMBER_OF_BOMBS) {
-      console.log('correct bombs', NUMBER_OF_BOMBS)
-      console.log('placed', bombsPlaced)
     const randomRow = Math.floor(Math.random() * MAX_ROWS);
     const randomCol = Math.floor(Math.random() * MAX_COLS);
 
     const currentCell = cells[randomRow][randomCol];
-    // if (currentCell.value !== CellValue.bomb) {
         if (currentCell.value !== 9) {
-        console.log('in if')
       cells[randomRow][randomCol] = {
         ...cells[randomRow][randomCol],
-        // value: CellValue.bomb,
         value: 9,
        
       };
@@ -56,7 +50,6 @@ export const generateCells = (): Cell[][] => {
           if (
             cells[adjacentToBombArray[index].row][
                 adjacentToBombArray[index].column
-            // ].value !== CellValue.bomb
         ].value !== 9
           ) {
             cells[adjacentToBombArray[index].row][
@@ -77,3 +70,4 @@ export const generateCells = (): Cell[][] => {
   }
   return cells;
 };
+
