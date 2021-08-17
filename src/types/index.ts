@@ -4,6 +4,8 @@ export enum CellState {
   flagged,
 }
 
+export const gameState = 'over'
+
 export enum Face {
   observe = "🧐",
   concern = "😬",

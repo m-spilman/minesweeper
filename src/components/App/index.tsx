@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import NumberDisplay from "../NumberDisplay";
-import { generateCells } from "../../utils";
+import { generateCells, checkGameWon } from "../../utils";
 import "./App.scss";
 import Button from "../Button";
 import { CellState, Face } from "../../types";
@@ -13,6 +13,14 @@ const App: React.FC = () => {
   const [time, setTime] = useState<number>(0);
   const [live, setLive] = useState<boolean>(false);
   const [bombCounter, setBombCounter] = useState<number>(10);
+  const [gameState, setGameState] = useState<string>("notCompleted");
+
+
+  useEffect(() =>{
+    if (checkGameWon(cells, bombCounter)) {
+        setGameState("won");
+      }
+},[cells,bombCounter])
 
   useEffect(() => {
     const handleMouseDown = (): void => {
@@ -20,7 +28,7 @@ const App: React.FC = () => {
     };
     const handleMouseUp = (): void => {
       setFace(Face.observe);
-    };
+    }
     window.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mouseup", handleMouseUp);
 
@@ -66,9 +74,11 @@ const App: React.FC = () => {
     };
     const updateSells = (index: number): void => {
       const newCells = cells.slice();
+
       newCells[adjacentToClickedCell[index].row][
         adjacentToClickedCell[index].column
       ].state = CellState.visible;
+
       newCells[rowParam][columnParam].state = CellState.visible;
 
       setCells(newCells);
@@ -107,12 +117,17 @@ const App: React.FC = () => {
       }
 
       if (currentCell.value === 9) {
-        //TODO handle bomb  click
+        setGameState("lost");
       } else if (currentCell.value === 0) {
         openCells(rowParam, columnParam);
       } else {
         newCells[rowParam][columnParam].state = CellState.visible;
         setCells(newCells);
+      }
+    
+
+      if (checkGameWon(cells, bombCounter)) {
+        setGameState("won");
       }
     };
   const handleCellContext =
@@ -140,6 +155,7 @@ const App: React.FC = () => {
       setTime(0);
       setCells(generateCells());
       setBombCounter(10);
+      setGameState("notCompleted");
     }
   };
 
@@ -154,22 +170,27 @@ const App: React.FC = () => {
           row={rowIndex}
           column={columnIndex}
           onContext={handleCellContext}
+          gameState={gameState}
         ></Button>
       ))
     );
   };
+
   return (
-    <div className="App">
-      <div className="Header">
-        <NumberDisplay value={bombCounter}></NumberDisplay>
-        <div className="Face" onClick={handleFaceClick}>
-          <span role="img" aria-label="face">
-            {face}
-          </span>
+    <div>
+      <div className={gameState === "won" ? "won" : "notCompleted"}>WINNER</div>
+      <div className="App">
+        <div className="Header">
+          <NumberDisplay value={bombCounter}></NumberDisplay>
+          <div className="Face" onClick={handleFaceClick}>
+            <span role="img" aria-label="face">
+              {face}
+            </span>
+          </div>
+          <NumberDisplay value={time}></NumberDisplay>
         </div>
-        <NumberDisplay value={time}></NumberDisplay>
+        <div className="Body">{renderCells()}</div>
       </div>
-      <div className="Body">{renderCells()}</div>
     </div>
   );
 };
